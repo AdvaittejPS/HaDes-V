@@ -25,7 +25,7 @@ module fetch_stage (
     // Internal PC register
     logic [31:0] pc;
 
-    // WISHBONE CONTINUOUS ASSIGNMENTS
+    // --- WISHBONE CONTINUOUS ASSIGNMENTS ---
     // Instruction fetches are read-only, full word, with no side-effects.
     assign wb.we  = 1'b0;
     assign wb.sel = 4'b1111;
@@ -38,7 +38,7 @@ module fetch_stage (
     assign wb.cyc = 1'b1;
     assign wb.stb = 1'b1;
 
-    // SEQUENTIAL LOGIC
+    // --- SEQUENTIAL LOGIC ---
     always_ff @(posedge clk) begin
         if (rst) begin
             pc <= constants::RESET_ADDRESS;
@@ -77,7 +77,7 @@ module fetch_stage (
             end
             // 3. STALL condition
             // If status_backwards_in == STALL, we do absolutely nothing.
-            // The PC doesn't advance and the output registers hold their previous valid state.
+            // The PC doesn't advance, and the output registers hold their previous valid state.
         end
     end
 

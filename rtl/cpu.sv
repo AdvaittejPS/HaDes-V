@@ -16,8 +16,8 @@ module cpu (
     input logic timer_interrupt_in
 );
 
-    // INTERCONNECT SIGNALS
-
+    // --- INTERCONNECT SIGNALS ---
+    
     // Fetch <-> Decode
     logic [31:0] f2d_instruction;
     logic [31:0] f2d_program_counter;
@@ -59,18 +59,18 @@ module cpu (
     // Writeback -> Decode (Forwarding)
     forwarding::t wb_forwarding;
 
-    // STAGE INSTANTIATIONS
-    
+    // --- STAGE INSTANTIATIONS ---
+
     fetch_stage fetch (
         .clk(clk),
         .rst(rst),
-        .wishbone(memory_fetch_port),
+        .wb(memory_fetch_port),
 
         .status_backwards_in(d2f_status_backwards),
-        .jump_address_in(d2f_jump_address),
+        .jump_address_backwards_in(d2f_jump_address),
 
-        .instruction_out(f2d_instruction),
-        .program_counter_out(f2d_program_counter),
+        .instruction_reg_out(f2d_instruction),
+        .program_counter_reg_out(f2d_program_counter),
         .status_forwards_out(f2d_status_forwards)
     );
 
@@ -85,15 +85,15 @@ module cpu (
         .exe_forwarding_in(exe_forwarding),
         .status_forwards_in(f2d_status_forwards),
         .status_backwards_in(e2d_status_backwards),
-        .jump_address_in(e2d_jump_address),
+        .jump_address_backwards_in(e2d_jump_address),
 
-        .instruction_out(d2e_instruction),
-        .program_counter_out(d2e_program_counter),
-        .rs1_data_out(d2e_rs1_data),
-        .rs2_data_out(d2e_rs2_data),
+        .instruction_reg_out(d2e_instruction),
+        .program_counter_reg_out(d2e_program_counter),
+        .rs1_data_reg_out(d2e_rs1_data),
+        .rs2_data_reg_out(d2e_rs2_data),
         .status_forwards_out(d2e_status_forwards),
         .status_backwards_out(d2f_status_backwards),
-        .jump_address_out(d2f_jump_address)
+        .jump_address_backwards_out(d2f_jump_address)
     );
 
     execute_stage execute (
@@ -106,42 +106,42 @@ module cpu (
         .rs2_data_in(d2e_rs2_data),
         .status_forwards_in(d2e_status_forwards),
         .status_backwards_in(m2e_status_backwards),
-        .jump_address_in(m2e_jump_address),
+        .jump_address_backwards_in(m2e_jump_address),
 
-        .instruction_out(e2m_instruction),
-        .program_counter_out(e2m_program_counter),
-        .next_pc_out(e2m_next_pc),
-        .rd_data_out(e2m_rd_data),
-        .source_data_out(e2m_source_data),
+        .instruction_reg_out(e2m_instruction),
+        .program_counter_reg_out(e2m_program_counter),
+        .next_program_counter_reg_out(e2m_next_pc),
+        .rd_data_reg_out(e2m_rd_data),
+        .source_data_reg_out(e2m_source_data),
         .forwarding_out(exe_forwarding),
         .status_forwards_out(e2m_status_forwards),
         .status_backwards_out(e2d_status_backwards),
-        .jump_address_out(e2d_jump_address)
+        .jump_address_backwards_out(e2d_jump_address)
     );
 
     memory_stage memory (
         .clk(clk),
         .rst(rst),
-        .wishbone(memory_mem_port),
+        .wb(memory_mem_port),
 
         .instruction_in(e2m_instruction),
         .program_counter_in(e2m_program_counter),
-        .next_pc_in(e2m_next_pc),
+        .next_program_counter_in(e2m_next_pc),
         .rd_data_in(e2m_rd_data),
         .source_data_in(e2m_source_data),
         .status_forwards_in(e2m_status_forwards),
         .status_backwards_in(w2m_status_backwards),
-        .jump_address_in(w2m_jump_address),
+        .jump_address_backwards_in(w2m_jump_address),
 
-        .instruction_out(m2w_instruction),
-        .program_counter_out(m2w_program_counter),
-        .next_pc_out(m2w_next_pc),
-        .rd_data_out(m2w_rd_data),
-        .source_data_out(m2w_source_data),
+        .instruction_reg_out(m2w_instruction),
+        .program_counter_reg_out(m2w_program_counter),
+        .next_program_counter_reg_out(m2w_next_pc),
+        .rd_data_reg_out(m2w_rd_data),
+        .source_data_reg_out(m2w_source_data),
         .forwarding_out(mem_forwarding),
         .status_forwards_out(m2w_status_forwards),
         .status_backwards_out(m2e_status_backwards),
-        .jump_address_out(m2e_jump_address)
+        .jump_address_backwards_out(m2e_jump_address)
     );
 
     writeback_stage writeback (
@@ -150,7 +150,7 @@ module cpu (
 
         .instruction_in(m2w_instruction),
         .program_counter_in(m2w_program_counter),
-        .next_pc_in(m2w_next_pc),
+        .next_program_counter_in(m2w_next_pc),
         .rd_data_in(m2w_rd_data),
         .source_data_in(m2w_source_data),
         .status_forwards_in(m2w_status_forwards),
@@ -159,7 +159,7 @@ module cpu (
 
         .forwarding_out(wb_forwarding),
         .status_backwards_out(w2m_status_backwards),
-        .jump_address_out(w2m_jump_address)
+        .jump_address_backwards_out(w2m_jump_address)
     );
 
 endmodule

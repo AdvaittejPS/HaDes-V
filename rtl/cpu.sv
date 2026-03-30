@@ -16,7 +16,7 @@ module cpu (
     input logic timer_interrupt_in
 );
 
-    // --- INTERCONNECT SIGNALS ---
+    // INTERCONNECT SIGNALS
 
     // Fetch <-> Decode
     logic [31:0] f2d_instruction;
@@ -59,8 +59,8 @@ module cpu (
     // Writeback -> Decode (Forwarding)
     forwarding::t wb_forwarding;
 
-    // --- STAGE INSTANTIATIONS ---
-
+    // STAGE INSTANTIATIONS
+    
     fetch_stage fetch (
         .clk(clk),
         .rst(rst),
